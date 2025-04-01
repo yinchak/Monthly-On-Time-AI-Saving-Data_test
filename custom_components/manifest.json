@@ -1,10 +1,10 @@
 {
-    "domain": "ai_saving",
-    "name": "AI Saving Data",
-    "version": "1.0.0",
-    "documentation": "https://github.com/yourusername/ai_saving",
-    "requirements": [],
-    "dependencies": [],
-    "codeowners": ["@yourusername"],
-    "iot_class": "local_polling"
-  }
+  "domain": "monthly_on_time_ai",
+  "name": "Monthly On-Time AI Saving Data",
+  "version": "1.0.0",
+  "documentation": "https://github.com/yinchak/Monthly-On-Time-AI-Saving-Data_test",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": ["@yinchak"],
+  "iot_class": "local_polling"
+}
