@@ -1,14 +1,13 @@
-from homeassistant.config_entries import ConfigEntry
+"""Initialize the Monthly On-Time AI Saving Data integration."""
 from homeassistant.core import HomeAssistant
 
 DOMAIN = "monthly_on_time_ai"
 
 async def async_setup(hass: HomeAssistant, config):
-    hass.data[DOMAIN] = {}
-    return True
-
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Set up the component."""
+    hass.data.setdefault(DOMAIN, {})
+    # 直接啟動 sensor platform
     hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, "sensor")
+        hass.helpers.discovery.async_load_platform("sensor", DOMAIN, {}, config)
     )
     return True

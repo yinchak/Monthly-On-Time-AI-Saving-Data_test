@@ -1,21 +1,28 @@
+"""Sensor platform for Monthly On-Time AI Saving Data."""
 import json
 import os
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.config_entries import ConfigEntry
 
 DOMAIN = "monthly_on_time_ai"
 DATA_FILE = "ai_saving_data.json"
 
-async def async_setup_entry(
+async def async_setup_platform(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config,
     async_add_entities: AddEntitiesCallback,
+    discovery_info=None
 ):
-    file_path = os.path.join(hass.config.config_dir, DATA_FILE)
-    with open(file_path, "r") as f:
-        data = json.load(f)
+    """Set up the sensor platform."""
+    # 改用相對路徑搵文件
+    file_path = os.path.join(os.path.dirname(__file__), DATA_FILE)
+    try:
+        with open(file_path, "r") as f:
+            data = json.load(f)
+    except Exception as e:
+        hass.components.logger.error(f"Error loading {DATA_FILE}: {e}")
+        return
 
     sensors = [
         AISavingSensor(data, "ai_saving_total", "AI Saving Total", "AISaving"),
@@ -47,13 +54,17 @@ async def async_setup_entry(
     async_add_entities(sensors)
 
 class AISavingSensor(SensorEntity):
+    """Representation of an AI Saving Sensor."""
+
     def __init__(self, data, unique_id, name, key, day=None):
+        """Initialize the sensor."""
         self._data = data
-        self._unique_id = unique_id
+        self._unique_id = f"monthly_on_time_ai_{unique_id}"
         self._name = name
         self._key = key
         self._day = day
         self._state = None
+        self.update()  # 一開始就更新狀態
 
     @property
     def name(self):
@@ -68,10 +79,14 @@ class AISavingSensor(SensorEntity):
         return self._state
 
     def update(self):
-        if self._day:
-            for entry in self._data[self._key]:
-                if entry["Day"] == self._day:
-                    self._state = entry["OnTime"]
-                    break
-        else:
-            self._state = self._data[self._key]
+        """Update the sensor state."""
+        try:
+            if self._day:
+                for entry in self._data[self._key]:
+                    if entry["Day"] == self._day:
+                        self._state = entry["OnTime"]
+                        break
+            else:
+                self._state = self._data[self._key]
+        except Exception as e:
+            self.hass.components.logger.error(f"Error updating {self._name}: {e}")
