@@ -1,12 +1,14 @@
 """Sensor platform for Monthly On-Time AI Saving Data."""
 import json
 import os
+import logging
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 DOMAIN = "monthly_on_time_ai"
 DATA_FILE = "ai_saving_data.json"
+_LOGGER = logging.getLogger(__name__)
 
 async def async_setup_platform(
     hass: HomeAssistant,
@@ -15,9 +17,15 @@ async def async_setup_platform(
     discovery_info=None
 ):
     """Set up the sensor platform."""
+    _LOGGER.warning("Monthly On-Time AI sensor platform is STARTING!")
     file_path = os.path.join(os.path.dirname(__file__), DATA_FILE)
-    with open(file_path, "r") as f:
-        data = json.load(f)
+    try:
+        with open(file_path, "r") as f:
+            data = json.load(f)
+        _LOGGER.warning("Loaded ai_saving_data.json successfully!")
+    except Exception as e:
+        _LOGGER.error(f"Failed to load {DATA_FILE}: {e}")
+        return
 
     sensors = [
         AISavingSensor(data, "ai_saving_total", "AI Saving Total", "AISaving"),
@@ -45,6 +53,7 @@ async def async_setup_platform(
             )
         )
     async_add_entities(sensors)
+    _LOGGER.warning("Monthly On-Time AI sensors ADDED!")
 
 class AISavingSensor(SensorEntity):
     """Representation of an AI Saving Sensor."""
@@ -63,6 +72,7 @@ class AISavingSensor(SensorEntity):
                     break
         else:
             self._state = self._data[self._key]
+        _LOGGER.warning(f"Created sensor: {self._name} with value {self._state}")
 
     @property
     def name(self):
