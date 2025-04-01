@@ -1,0 +1,10 @@
+{
+    "domain": "ai_saving",
+    "name": "AI Saving Data",
+    "version": "1.0.0",
+    "documentation": "https://github.com/yourusername/ai_saving",
+    "requirements": [],
+    "dependencies": [],
+    "codeowners": ["@yourusername"],
+    "iot_class": "local_polling"
+  }
